@@ -29,7 +29,18 @@ class MyMap {
     }
 
     private getIndexPair(key: string, hash: number): number {
-        return this.data[hash].findIndex((pair) => pair[0] === key);
+        const hashHash = this.hasEqualHash(hash);
+        if (!hashHash) {
+            throw new Error('данный ключ не существует')
+        }
+
+        const index: number = this.data[hash].findIndex((pair) => pair[0] === key);
+
+        if (index === -1) {
+            throw new Error('ключ не найден')
+        }
+
+        return index;
     }
 
     add(key: string, value: Value): void {
@@ -40,10 +51,12 @@ class MyMap {
             const hasEqualKey = this.data[hash].some((pair) => pair[0] === key)
             if (!hasEqualKey) {
                 this.data[hash].push([key, value])
+                return;
             }
 
             const indexPair = this.getIndexPair(key, hash);
             this.data[hash][indexPair] = [key, value];
+            return;
         }
 
         this.data[hash] = [[key, value]]
@@ -62,7 +75,8 @@ class MyMap {
 
     getValue(key: string): Value {
         const hash = this.getHash(key)
-        const index = this.getIndexPair(key, hash)
+        const index = this.getIndexPair(key, hash);
+
         return this.data[hash][index][1]
     }
 
@@ -75,12 +89,8 @@ const map = new MyMap();
 map.add('abc', 1)
 map.add('bca', 1)
 map.add('aboba', 1)
-console.log(map)
 map.add('abc', 2)
-console.log(map)
-map.delete('abc')
 map.getValue('bca')
 map.getValue('abc')
-console.log(map)
+map.delete('abc')
 map.clear()
-console.log(map)
